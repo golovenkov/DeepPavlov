@@ -29,9 +29,10 @@
       {
         "info": "2. Find relevant contexts",
         "class_name": "tfidf_ranker_adv",
-        "max_n": [100, 2800, 100],
+        "max_n": [100, 300, 100],
+        "weights": [0.05, 0.2, 0.07],
         "in": ["queries_batch"],
-        "out": ["tfidf_doc_ids", "tfidf_doc_scores"],
+        "out": ["tfidf_doc_ids", "tfidf_doc_scores", "weights"],
         "vectorizer": "#vectorizer"
       },
       {
@@ -86,7 +87,7 @@
         "embedding_dim": "#word2vec_embedder.dim",
         "emb_matrix": "#embeddings.emb_mat",
         "learning_rate": 1e-3,
-        "batch_size": 3000,
+        "batch_size": 500,
         "seed": 65,
         "load_path": "{MODELS_PATH}/chitchat_2staged_tfidf_smn_v13/model_smn/model",
         "save_path": "{MODELS_PATH}/chitchat_2staged_tfidf_smn_v13/model_smn/model"
@@ -94,9 +95,9 @@
       {
         "info": "5. Return actual response",
         "class_name": "hybrid_ranker_predictor",
-        "sample_size": 13,
+        "sample_size": 9,
         "lambda_coeff": 10.0,
-        "in": ["response_candidates", "y_predicted"],
+        "in": ["response_candidates", "y_predicted", "weights"],
         "out": ["best_responses", "best_responses_scores"]
       }
     ],

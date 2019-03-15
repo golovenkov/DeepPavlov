@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import List
 from logging import getLogger
 import numpy as np
 
@@ -32,7 +33,7 @@ class HybridRankerPredictor(Component):
         self.lambda_coeff = lambda_coeff
 
 
-    def __call__(self, candidates_batch, preds_batch):
+    def __call__(self, candidates_batch, preds_batch, weights: List[List[float]] = None):
         """
         return list of best responses and its confidences
         """
@@ -41,7 +42,7 @@ class HybridRankerPredictor(Component):
         responses_preds = []
 
         for i in range(len(candidates_batch)):
-            d = {candidates_batch[i][j]: preds_batch[i][j] for j in range(len(preds_batch[i]))}
+            d = {candidates_batch[i][j]: preds_batch[i][j] + weights[i][j] for j in range(len(preds_batch[i]))}
             candidates_list = list(set(candidates_batch[i]))
             scores = np.array([d[c] for c in candidates_list])
 
@@ -59,10 +60,10 @@ class HybridRankerPredictor(Component):
 
             chosen_index = np.random.choice(sorted_ids[:self.sample_size], p=w)
 
-            # logger.debug('candidates: ' + str([candidates_list[i] for i in sorted_ids[:self.sample_size]]) + 'scores: ' +
-            #              str([sorted_scores[i] for i in range(self.sample_size)]))  # DEBUG
-            # logger.debug('answer: ' + str(chosen_index) + " ; " + str(scores[chosen_index]) + " ; " +
-            #              str(candidates_list[chosen_index]))  # DEBUG
+            logger.debug('candidates: ' + str([candidates_list[i] for i in sorted_ids[:self.sample_size]]) + 'scores: ' +
+                         str([sorted_scores[i] for i in range(self.sample_size)]))  # DEBUG
+            logger.debug('answer: ' + str(chosen_index) + " ; " + str(scores[chosen_index]) + " ; " +
+                         str(candidates_list[chosen_index]))  # DEBUG
 
             responses_batch.append(candidates_list[chosen_index])
             responses_preds.append(scores[chosen_index])

@@ -32,13 +32,19 @@ class TfidfRankerAdv(Component):
 
     """
 
-    def __init__(self, vectorizer: HashingTfIdfVectorizer, top_n=5, max_n: List[int] = None, active: bool = True, **kwargs):
+    def __init__(self,
+                 vectorizer: HashingTfIdfVectorizer,
+                 top_n=5,
+                 max_n: List[int] = None,
+                 weights: List[float] = None,
+                 active: bool = True,
+                 **kwargs):
 
         self.max_n = max_n
         self.top_n = top_n
         self.vectorizer = vectorizer
         self.active = active
-
+        self.weights = weights
 
     def __call__(self, batch_questions: List[List[str]]) -> Tuple[List[Any], List[float]]:
         """
@@ -47,6 +53,7 @@ class TfidfRankerAdv(Component):
         """
 
         batch_doc_ids, batch_docs_scores = [], []
+        batch_doc_weights = []
 
         for batch_q in batch_questions:
 
@@ -55,6 +62,7 @@ class TfidfRankerAdv(Component):
 
             doc_scores = []
             doc_ids = []
+            doc_weights = []
             for j, q_tfidf in enumerate(q_tfidfs):
                 top_n = self.max_n[j]
                 # logger.debug("vector: " + str(q_tfidf))
@@ -76,6 +84,7 @@ class TfidfRankerAdv(Component):
 
                 doc_scores.extend(scores[o_sort])
                 doc_ids.extend([self.vectorizer.index2doc[i] for i in o_sort])
+                doc_weights.extend([self.weights[j]] * len(o_sort))
                 # logger.debug("[docs]: " + str(doc_scores) + str(doc_ids))
 
             # Then we should sort doc_ids, doc_scores
@@ -83,5 +92,6 @@ class TfidfRankerAdv(Component):
 
             batch_doc_ids.append(doc_ids)
             batch_docs_scores.append(doc_scores)
+            batch_doc_weights.append(doc_weights)
 
-        return batch_doc_ids, batch_docs_scores
+        return batch_doc_ids, batch_docs_scores, batch_doc_weights
