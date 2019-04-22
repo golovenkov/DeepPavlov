@@ -82,6 +82,7 @@
     ]
   },
   "train": {
+    "class_name": "nn_trainer",
     "epochs": 8,
     "batch_size": 500,
     "pytest_max_batches": 2,
@@ -95,6 +96,10 @@
     "validation_patience": 3,
     "val_every_n_epochs": 1,
     "log_every_n_batches": 100,
+    "evaluation_targets": [
+      "valid",
+      "test"
+    ],
     "tensorboard_log_dir": "{MODELS_PATH}/ubuntu_v2_mt_word2vec_smn/logs_smn/"
   },
   "metadata": {

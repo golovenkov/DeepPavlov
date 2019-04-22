@@ -86,6 +86,7 @@
     ]
   },
   "train": {
+    "class_name": "nn_trainer",
     "epochs": 8,
     "batch_size": 100,
     "shuffle": true,
@@ -102,6 +103,10 @@
     "validation_patience": 1,
     "val_every_n_epochs": 1,
     "log_every_n_batches": 100,
+    "evaluation_targets": [
+      "valid",
+      "test"
+    ],
     "tensorboard_log_dir": "{MODELS_PATH}/ubuntu_v1_mt_word2vec_dam_transformer/logs_dam/"
   },
   "metadata": {

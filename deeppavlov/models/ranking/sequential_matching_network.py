@@ -12,14 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from logging import getLogger
+
 import numpy as np
 import tensorflow as tf
 
-from deeppavlov.core.common.log import get_logger
 from deeppavlov.core.common.registry import register
 from deeppavlov.models.ranking.tf_base_matching_model import TensorflowBaseMatchingModel
 
-log = get_logger(__name__)
+log = getLogger(__name__)
 
 
 @register('smn_nn')
@@ -142,6 +143,7 @@ class SMNNetwork(TensorflowBaseMatchingModel):
         logits = tf.layers.dense(last_hidden, 2, kernel_initializer=tf.contrib.layers.xavier_initializer(),
                                  name='final_v')
         self.y_pred = tf.nn.softmax(logits)
+        self.logits = logits
         self.loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels=self.y_true, logits=logits))
         optimizer = tf.train.AdamOptimizer(learning_rate=self.learning_rate)
         self.train_op = optimizer.minimize(self.loss)

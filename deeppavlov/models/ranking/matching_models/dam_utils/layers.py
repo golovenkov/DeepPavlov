@@ -25,12 +25,13 @@
 #
 # Based on authors' Tensorflow code: https://github.com/baidu/Dialogue/tree/master/DAM
 
+from logging import getLogger
+
 import tensorflow as tf
 
-from deeppavlov.core.common.log import get_logger
 import deeppavlov.models.ranking.matching_models.dam_utils.operations as op
 
-log = get_logger(__name__)
+log = getLogger(__name__)
 
 
 def similarity(x, y, x_lengths, y_lengths):

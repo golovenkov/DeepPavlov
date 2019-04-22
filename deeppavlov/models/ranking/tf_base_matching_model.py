@@ -14,14 +14,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-import numpy as np
-from typing import List, Iterable, Dict, Tuple
+from logging import getLogger
+from typing import List, Dict, Tuple
 
-from deeppavlov.core.common.log import get_logger
+import numpy as np
+
 from deeppavlov.core.models.tf_model import TFModel
 from deeppavlov.models.ranking.siamese_model import SiameseModel
 
-log = get_logger(__name__)
+log = getLogger(__name__)
 
 
 class TensorflowBaseMatchingModel(TFModel, SiameseModel):
@@ -33,18 +34,22 @@ class TensorflowBaseMatchingModel(TFModel, SiameseModel):
         (derived from TFModel and initialized by Chainer)
 
     Args:
-        batch_size (int): a number of samples in a batch
+        batch_size (int): a number of samples in a batch.
+        num_context_turns (int): a number of ``context`` turns in data samples.
+        mean_oov (bool): whether to set mean embedding of all tokens. By default: True.
 
     """
 
     def __init__(self,
-                 batch_size,
-                 num_context_turns = 10,
+                 batch_size: int,
+                 num_context_turns: int = 10,
+                 mean_oov: bool = True,
                  *args,
                  **kwargs):
         super(TensorflowBaseMatchingModel, self).__init__(batch_size=batch_size, num_context_turns=num_context_turns,
                                                           *args, **kwargs)
-        self.emb_matrix[1] = np.mean(self.emb_matrix[2:], axis=0)  # set mean embedding for OOV token at the 2nd index
+        if mean_oov:
+            self.emb_matrix[1] = np.mean(self.emb_matrix[2:], axis=0)  # set mean embedding for OOV token at the 2nd index
 
     def _append_sample_to_batch_buffer(self, sample: List[np.ndarray], buf: List[Tuple]) -> int:
         """
@@ -136,7 +141,7 @@ class TensorflowBaseMatchingModel(TFModel, SiameseModel):
         Returns:
             nd.array: predictions for the batch
         """
-        return self.sess.run(self.y_pred, feed_dict=batch)[:, 1]
+        return self.sess.run(self.logits, feed_dict=batch)[:, 1]
 
     def _train_on_batch(self, batch: Dict, y: List[int]) -> float:
         """
