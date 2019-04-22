@@ -1,5 +1,5 @@
 {
-  "info": "(v23_g; 18.03) Gopnik V5 Bot. Books_v2 + VK + pBot. +replaced replicas; -hedgehogs; +spherical horse; Total 577285 dialogs",
+  "info": "Bot+intents+sentiment (v24_g; 09.04.19) Gopnik V5 Bot. Books_v2 + VK + pBot. +replaced replicas; -hedgehogs; +spherical horse; Total 577285 dialogs",
   "chainer": {
     "in": ["utterances_batch", "history_batch", "states_batch"],
     "pipe": [
