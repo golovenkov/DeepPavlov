@@ -37,6 +37,7 @@ class TensorflowBaseMatchingModel(TFModel, SiameseModel):
         batch_size (int): a number of samples in a batch.
         num_context_turns (int): a number of ``context`` turns in data samples.
         mean_oov (bool): whether to set mean embedding of all tokens. By default: True.
+        use_logits (bool): whether to use raw logits as outputs instead of softmax predictions
 
     """
 
@@ -44,10 +45,12 @@ class TensorflowBaseMatchingModel(TFModel, SiameseModel):
                  batch_size: int,
                  num_context_turns: int = 10,
                  mean_oov: bool = True,
+                 use_logits: bool = False,
                  *args,
                  **kwargs):
         super(TensorflowBaseMatchingModel, self).__init__(batch_size=batch_size, num_context_turns=num_context_turns,
                                                           *args, **kwargs)
+        self.use_logits = use_logits
         if mean_oov:
             self.emb_matrix[1] = np.mean(self.emb_matrix[2:], axis=0)  # set mean embedding for OOV token at the 2nd index
 
@@ -139,9 +142,12 @@ class TensorflowBaseMatchingModel(TFModel, SiameseModel):
             batch (Dict): feed_dict that contains a batch with inputs for a model
 
         Returns:
-            nd.array: predictions for the batch
+            nd.array: predictions for the batch (raw logits or softmax outputs)
         """
-        return self.sess.run(self.logits, feed_dict=batch)[:, 1]
+        if self.use_logits:
+            return self.sess.run(self.logits, feed_dict=batch)[:, 1]
+        else:
+            return self.sess.run(self.y_pred, feed_dict=batch)[:, 1]
 
     def _train_on_batch(self, batch: Dict, y: List[int]) -> float:
         """
